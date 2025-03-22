@@ -23,7 +23,10 @@ int main () {
 	printf("\n"); // adicionar uma quebra de linha adicional para ficar mais bonitinho
 
 	FILE *arquivo = fopen(input, "r");
-
+	  if(arquivo == NULL) {
+    		printf("Falha ao acessar o arquivo\n"); // Caso o usuário coloque um arquivo inexistente
+    		return 1;
+  	}
 	fscanf(arquivo, "%d %d", &row, &column);
 	
 	celula labirinto[row][column];
@@ -66,7 +69,7 @@ int main () {
 		
 	 printf("\n");
 	 
-	 printf("SALVO COM SUCESSO!");
+	 printf("SALVO COM SUCESSO!\n");
 		 
 		 
 	 fclose(arquivo);
