@@ -41,7 +41,7 @@ int direcoes[4][2] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}}; // Cima, Baixo, Esquerd
 void posicaoI(celula labirinto[MAX_ROW][MAX_COL], int row, int column, int *x, int *y) {
     for (int i = 0; i < row; i++) {
         for (int j = 0; j < column; j++) {
-            if (labirinto[i][j].simbolo == '@') {
+            if (labirinto[i][j].simbolo == '$') {
                 *x = i;
                 *y = j;
                 return;
@@ -84,40 +84,57 @@ void algrtm(celula labirinto[MAX_ROW][MAX_COL], int row, int column, int startX,
         frente++;
 
         // Constroe o caminho correto
-        if (labirinto[atualX][atualY].simbolo == '$') {
-
+   
+        if (labirinto[atualX][atualY].simbolo == '@') {
             int x = atualX, y = atualY;
             while (x != -1 && y != -1) {
-                if (labirinto[x][y].simbolo != '@') {
-                    if(labirinto[x][y].simbolo != '$') {
+                if (labirinto[x][y].simbolo != '$') {
+                    if(labirinto[x][y].simbolo != '@') {
                         if(labirinto[x][y].simbolo == '%') {
                             srand(time(0));
                             int in = 5;
                             if (prob(in)) {
                                 labirinto[x][y].simbolo = '!';
+                                in++;
                                 }
                             else {
                                 labirinto[x][y].simbolo = '+';
+                                printf("\n");
+                                printf("O personagem foi derrotado em combate!\n\n");
+                                for (int i = 0; i < row; i++) {
+									for (int j = 0; j < column; j++) {
+										printf("%c ", labirinto[i][j].simbolo);  // laço for para exibir o caminho na tela
+									}
+									printf("\n");
+								}
+                                return;
                                 }
                         } else {
                             labirinto[x][y].simbolo = '*'; // Marca o caminho
                         }
-                    } else {
-                      labirinto[x][y].simbolo = 'v'; // Simboliza a vitória
-                    }
+                    } 
                 }
                 int tempX = orgX[x][y];
                 int tempY = orgY[x][y];
                 x = tempX;
                 y = tempY;
             }
+            printf("\n");
+            printf("O personagem venceu todos os inimigos e chegou ao destino!\n\n");
             for (int i = 0; i < row; i++) {
+				for (int j = 0; j < column; j++) {
+					if (labirinto[i][j].simbolo == '$') {       // laço for para trocar o símbo da vitória quando ele chega ao destino
+						labirinto[i][j].simbolo = 'v';
+						}
+					}
+				}
+			for (int i = 0; i < row; i++) {
                 for (int j = 0; j < column; j++) {
-                    printf("%c ", labirinto[i][j].simbolo);
+                    printf("%c ", labirinto[i][j].simbolo);        // laço for para exibir o caminho na tela
                 }
                 printf("\n");
             }
-            printf("\n");
+	
             return;
         }
 
@@ -195,6 +212,8 @@ int main(int argc, char *argv[]) {
       labirinto[i][j].visitada = 0;
       }
     }
+    
+  printf("Labirinto carregado!\n\n");
 
   for (int i = 0; i < row; i++) {
     for (int j = 0; j < column; j++) {                     // Laço para imprimir a matriz já formatada na tela
@@ -224,7 +243,7 @@ int main(int argc, char *argv[]) {
   arquivo = fopen(input2, "w"); 
 
    if(modo == 1){
-  algrtm(labirinto, row, column, startX, startY);
+    algrtm(labirinto, row, column, startX, startY);
    } else {
     caminhoerrado(labirinto, row, column, startX, startY);
    }
