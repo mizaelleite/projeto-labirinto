@@ -78,6 +78,8 @@ void algrtm(celula labirinto[MAX_ROW][MAX_COL], int row, int column, int startX,
     distancia[startX][startY] = 0;
     tras++;
 
+    int in = 5; // definindo uma variável que será usada no sistema de combate
+
     while (frente < tras) {
         int atualX = filaX[frente];
         int atualY = filaY[frente];
@@ -92,7 +94,6 @@ void algrtm(celula labirinto[MAX_ROW][MAX_COL], int row, int column, int startX,
                     if(labirinto[x][y].simbolo != '@') {
                         if(labirinto[x][y].simbolo == '%') {
                             srand(time(0));
-                            int in = 5;
                             if (prob(in)) {
                                 labirinto[x][y].simbolo = '!';
                                 in++;
