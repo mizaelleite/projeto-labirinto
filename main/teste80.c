@@ -93,7 +93,6 @@ void algrtm(celula labirinto[MAX_ROW][MAX_COL], int row, int column, int startX,
                 if (labirinto[x][y].simbolo != '$') {
                     if(labirinto[x][y].simbolo != '@') {
                         if(labirinto[x][y].simbolo == '%') {
-                            srand(time(0));
                             if (prob(in)) {
                                 labirinto[x][y].simbolo = '!';
                                 in++;
@@ -184,6 +183,7 @@ void caminhoerrado(celula labirinto[MAX_ROW][MAX_COL], int row, int column, int 
 
 
 int main(int argc, char *argv[]) {
+    srand(time(NULL));
     int row, column,modo;
      // Verifica se o usuário passou o nome do arquivo de entrada
     if (argc < 2) {
