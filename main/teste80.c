@@ -159,16 +159,22 @@ void algrtm(celula labirinto[MAX_ROW][MAX_COL], int row, int column, int startX,
 }
 
 void caminhoerrado(celula labirinto[MAX_ROW][MAX_COL], int row, int column, int x, int y) {
-    int passos = 0;
+    int passos = 0,velhox,velhoy;
     srand(time(NULL)); // faz com que os caminhos sejam diferentes
+	velhox = x;
+        velhoy = y;
+        labirinto[velhox][velhoy].simbolo = '@'; // marcam a posição inicial do personagem 
 
     while (passos< 20) { // Tenta andar algumas vezes antes de parar
+	    if (!(x == velhox && y == velhoy)){
+              labirinto[x][y].simbolo = '*'; // marca o caminho feito pelo personagem
+        }
         labirinto[x][y].simbolo = '*';
         int direcao = rand() % 4; // escolhe uma direção
         int novoX = x + direcoes[direcao][0];
         int novoY = y + direcoes[direcao][1];
 
-        if (!ehValido(novoX, novoY, row, column) || labirinto[novoX][novoY].simbolo == '#' || labirinto[novoX][novoY].simbolo == '*') {
+        if (!ehValido(novoX, novoY, row, column) || labirinto[novoX][novoY].simbolo == '#' || labirinto[novoX][novoY].simbolo == '*' || labirinto[novoX][novoY].simbolo == '@' ) {
             passos++;  // verifica se o passo é válido
         } else {
             x = novoX;
@@ -178,6 +184,16 @@ void caminhoerrado(celula labirinto[MAX_ROW][MAX_COL], int row, int column, int 
     }
     
     labirinto[x][y].simbolo = '?'; // Simboliza que o personagem se perdeu
+	
+	for (int i = 0; i < row; i++) {
+        for (int j = 0; j < column; j++) {
+            printf("%c ", labirinto[i][j].simbolo); // imprime o labirinto na tela
+        }
+        printf("\n");
+    }
+    printf("\n");
+    printf("O personagem se perdeu!\n");
+    return;
 }
 
 
