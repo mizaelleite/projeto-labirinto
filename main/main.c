@@ -359,7 +359,7 @@ int main(int argc, char *argv[]) {
 				}
 			if (count > 100) {
 				printf("Maximo de tentativas realizadas. Nao foi possivel concluir o labirinto.");
-				break;
+				return 0;
 				}
 			}
 		printf("O labirinto foi resolvido apos %d tentativa(s)\n", count);
