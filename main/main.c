@@ -7,8 +7,7 @@
 #define MAX_COL 20
 // Define a proporção máxima do labirinto que diz no doc p/ evitar problema de alocação de memória
 
-// modo 1 = o personagem ganha
-// modo 2 = o personagem se perde
+
 
 int prob (int n) {// Função de teste de probabilidade para o sistema de combate
 
