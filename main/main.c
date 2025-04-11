@@ -56,7 +56,8 @@ int ehValido(int x, int y, int row, int column) {
 }
 // Verifica se o vizinho é válido
 
-void algrtm(celula labirinto[MAX_ROW][MAX_COL], int row, int column, int startX, int startY) { // Algoritmo de busca em largura
+
+int algrtm(celula labirinto[MAX_ROW][MAX_COL], int row, int column, int startX, int startY) { // Algoritmo de busca em largura
     int filaX[MAX_ROW * MAX_COL], filaY[MAX_ROW * MAX_COL];
     int frente = 0, tras = 0;
 
@@ -107,7 +108,7 @@ void algrtm(celula labirinto[MAX_ROW][MAX_COL], int row, int column, int startX,
 									}
 									printf("\n");
 								}
-                                return;
+                                return 0;
                                 }
                         } else {
                             labirinto[x][y].simbolo = '*'; // Marca o caminho
@@ -135,7 +136,7 @@ void algrtm(celula labirinto[MAX_ROW][MAX_COL], int row, int column, int startX,
                 printf("\n");
             }
 	
-            return;
+            return 1;
         }
 
         // Verifica as posições vizinhas
@@ -155,35 +156,66 @@ void algrtm(celula labirinto[MAX_ROW][MAX_COL], int row, int column, int startX,
             }
         }
     }
-
+return 0;
 }
 
-void caminhoerrado(celula labirinto[MAX_ROW][MAX_COL], int row, int column, int x, int y) {
-    int passos = 0,velhox,velhoy;
-    srand(time(NULL)); // faz com que os caminhos sejam diferentes
-	velhox = x;
-        velhoy = y;
-        labirinto[velhox][velhoy].simbolo = '@'; // marcam a posição inicial do personagem 
+int caminhoaleatorio(celula labirinto[MAX_ROW][MAX_COL], int row, int column, int x, int y) {
+    int passos = 0;
+    int in = 5;
 
-    while (passos< 20) { // Tenta andar algumas vezes antes de parar
-	    if (!(x == velhox && y == velhoy)){
-              labirinto[x][y].simbolo = '*'; // marca o caminho feito pelo personagem
-        }
-        labirinto[x][y].simbolo = '*';
+    while (passos < 20) { // Tenta andar algumas vezes antes de parar
+		
         int direcao = rand() % 4; // escolhe uma direção
         int novoX = x + direcoes[direcao][0];
         int novoY = y + direcoes[direcao][1];
 
-        if (!ehValido(novoX, novoY, row, column) || labirinto[novoX][novoY].simbolo == '#' || labirinto[novoX][novoY].simbolo == '*' || labirinto[novoX][novoY].simbolo == '@' ) {
-            passos++;  // verifica se o passo é válido
-        } else {
+        if (!(ehValido(novoX, novoY, row, column)) || (labirinto[novoX][novoY].simbolo == '#') || (labirinto[novoX][novoY].simbolo == '*') || (labirinto[novoX][novoY].simbolo == '@' ) || (labirinto[novoX][novoY].simbolo == '!' )) {
+            passos++; }  // verifica se o passo é válido
+            
+        else if (labirinto[novoX][novoY].simbolo == '%') {
+			if (prob(in)) { // verificando se ele ganha o combate
+				labirinto[novoX][novoY].simbolo = '!';
+				x = novoX;
+                y = novoY; 
+                passos = 0;
+                labirinto[x][y].simbolo = '!'; 
+				}
+			else {
+				printf("O personagem foi derrotado em combate!\n");
+				labirinto[novoX][novoY].simbolo = '+'; // caso ele perca o combate
+				for (int i = 0; i < row; i++) {
+				for (int j = 0; j < column; j++) {
+					printf("%c ", labirinto[i][j].simbolo); // imprime o labirinto na tela
+				}
+				printf("\n");
+			}
+				return 0;
+				}
+			
+			}
+		else if (labirinto[novoX][novoY].simbolo == '$') {
+			printf("O personagem encontrou o caminho!\n"); // caso ele ache o caminho, irá marcar como vitória
+			labirinto[novoX][novoY].simbolo = 'v';
+			for (int i = 0; i < row; i++) {
+				for (int j = 0; j < column; j++) {
+					printf("%c ", labirinto[i][j].simbolo); // imprime o labirinto na tela
+				}
+				printf("\n");
+			}
+			return 1;
+			}
+        else {
             x = novoX;
             y = novoY; 
-            passos = 0; 
+            passos = 0;
+            labirinto[x][y].simbolo = '*'; 
         }
-    }
-    
+	}
+	
+ 
     labirinto[x][y].simbolo = '?'; // Simboliza que o personagem se perdeu
+    
+    printf("O personagem se perdeu!\n\n");
 	
 	for (int i = 0; i < row; i++) {
         for (int j = 0; j < column; j++) {
@@ -192,15 +224,17 @@ void caminhoerrado(celula labirinto[MAX_ROW][MAX_COL], int row, int column, int 
         printf("\n");
     }
     printf("\n");
-    printf("O personagem se perdeu!\n");
-    return;
+
+    return 0;
 }
+
 
 
 
 int main(int argc, char *argv[]) {
     srand(time(NULL));
-    int row, column,modo;
+    int row, column, modo, modo2;
+    int ci,cj, count = 0, ver;
      // Verifica se o usuário passou o nome do arquivo de entrada
     if (argc < 2) {
             printf("Uso: %s <arquivo_de_entrada>\n", argv[0]);
@@ -215,12 +249,10 @@ int main(int argc, char *argv[]) {
             return 1;
         }
 
-    printf("Qual o modo?\n");// Pede ao usuário qual o modo do labirinto
-    scanf("%d", &modo);
-    getchar();
-
   fscanf(arquivo, "%d %d", &row, &column);
   celula labirinto[MAX_ROW][MAX_COL];
+  
+  printf("Labirinto carregado!\n\n");
 
   for (int i = 0; i < row; i++) { 
     for (int j = 0; j < column; j++) {                     // Laço para pegar os elementos do arquivo e armazenar em uma matriz
@@ -230,21 +262,26 @@ int main(int argc, char *argv[]) {
       }
     }
     
-  printf("Labirinto carregado!\n\n");
-
-  for (int i = 0; i < row; i++) {
-    for (int j = 0; j < column; j++) {                     // Laço para imprimir a matriz já formatada na tela
-      printf("%c ", labirinto[i][j].simbolo);
-      }
-      printf("\n");
+  celula labirintoOriginal[MAX_ROW][MAX_COL];             // Cópia do labirinto para usar dentro do while
+    for (int i = 0; i < row; i++) { 
+    for (int j = 0; j < column; j++) {
+        labirintoOriginal[i][j] = labirinto[i][j];
     }
-  printf("\n");
-
-    // Pede ao usuário o nome do arquivo de saída
+}
+    
+    for (int i = 0; i < row; i++) {
+		for (int j = 0; j < column; j++) {                     // Laço para imprimir a matriz já formatada na tela
+		  printf("%c ", labirinto[i][j].simbolo);
+		  }
+		  printf("\n");
+		}
+	  printf("\n");
+	  
+	// Pede ao usuário o nome do arquivo de saída
     char input2[15];
     char t[] = ".txt"; 
-
-    printf("Digite o nome do arquivo para salvar: ");
+	  
+	printf("Escreva como deseja que o arquivo seja salvo: ");
     fgets(input2, sizeof(input2), stdin);
 
 
@@ -253,17 +290,91 @@ int main(int argc, char *argv[]) {
 
     // Adiciona a extensão .txt automaticamente
     strcat(input2, t);
-
+    
+    printf("Escolha um dos seguintes modos:\n1 -> Resolver com uma tentativa\n2 -> Resolver ate obter sucesso\n3 -> Sair do programa\n");// Pede ao usuário qual o modo do labirinto
+    scanf("%d", &modo);
+    getchar();
+  
   int startX, startY;
   posicaoI(labirinto, row, column, &startX, &startY);
+
+  if(modo == 1){
+	   printf("Escolha uma das alternativas:\n1 -> Tentar resolver de forma inteligente\n2 -> Tentar resolver de forma aleatoria\n");
+	   scanf("%d", &modo2);
+	   if (modo2 == 1) {
+		   algrtm(labirinto, row, column, startX, startY);
+		   }
+	   else if (modo2 == 2) {
+		   for (int i = 0; i < row ; i++) {
+			   for (int j = 0; j < column; j++) {
+				   if (labirinto[i][j].simbolo == '@') {
+					  ci = i;
+					  cj = j;
+				   }
+			   }
+		   }
+		   
+		caminhoaleatorio(labirinto,row,column,ci,cj);
+   }
+}
+
+   else if (modo == 2) {
+	   printf("Escolha uma das alternativas:\n1 -> Tentar resolver de forma inteligente\n2 -> Tentar resolver de forma aleatoria\n");
+	   scanf("%d", &modo2);
+	   if (modo2 == 1) {
+		   while (1) {
+			   for (int i = 0; i < row; i++) {
+                for (int j = 0; j < column; j++) {               // laço for para criar uma cópia toda vez a cada execução do labirinto
+                    labirinto[i][j] = labirintoOriginal[i][j];
+                }
+            }
+			   ver = algrtm(labirinto,row, column, startX, startY);
+			   count++;
+			   if (ver == 1) {
+				   break;
+				   }
+			   }
+		   printf("O labirinto foi resolvido apos %d tentativa(s)\n", count);
+	   }
+	    else if (modo2 == 2) {
+		   for (int i = 0; i < row ; i++) {
+			   for (int j = 0; j < column; j++) {
+				   if (labirinto[i][j].simbolo == '@') {
+					  ci = i;
+					  cj = j;
+				   }
+			   }
+		   }
+		   
+		while (1) {
+			for (int i = 0; i < row; i++) {
+                for (int j = 0; j < column; j++) {
+                    labirinto[i][j] = labirintoOriginal[i][j];
+                }
+            }
+			ver = caminhoaleatorio(labirinto, row, column, ci, cj);
+			count++;
+			if (ver == 1) {
+				break;
+				}
+			if (count > 100) {
+				printf("Maximo de tentativas realizadas. Nao foi possivel concluir o labirinto.");
+				break;
+				}
+			}
+		printf("O labirinto foi resolvido apos %d tentativa(s)\n", count);
+   }
+}
+
+    else {
+		printf("Programa encerrado...");
+		return 0;
+	}
+
   
   arquivo = fopen(input2, "w"); 
 
-   if(modo == 1){
-    algrtm(labirinto, row, column, startX, startY);
-   } else {
-    caminhoerrado(labirinto, row, column, startX, startY);
-   }
+    
   
    for (int i = 0; i < row; i++){ // Laço for para printar os elementos do labirinto em outro arquivo e deixar salvo.
 
